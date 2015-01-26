@@ -8,5 +8,9 @@ Based on the Forecast.io API to GET JSON data for a location (currently hardcode
 1/24:
 - GET JSON data from forecast.io and log data into console
 - Ability to verify network access and connectivity (Dialog + Toast alerts for network issues).
-- Bobby verified access and credentials
 
+1/25:
+- Added weather UI drawables to project
+- Created new class CurrentWeather to parse JSON data properly
+- Filter weather data to associated drawable
+- Add Object to convert UNIX system time to standard date time "h:mm am/pm"
