@@ -16,6 +16,9 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.NetworkInterface;
 
@@ -23,6 +26,8 @@ import java.net.NetworkInterface;
 public class MainActivity extends ActionBarActivity {
     //TAG variable for logging activity in MainActivity
     private static final String TAG = MainActivity.class.getSimpleName();
+    //Member variable for current weather class
+    private CurrentWeather mCurrentWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +59,13 @@ public class MainActivity extends ActionBarActivity {
                 @Override //Completed network GET
                 public void onResponse(Response response) throws IOException {
                     try {
-                        Log.v(TAG, response.body().string());
+                        //Move JSON response to a String so we can manipulate the data
+                        String jsonData = response.body().string();
+                        //log the json response
+                        Log.v(TAG,jsonData );
                         if (response.isSuccessful()) {
+                            //set member variable to new object for sorting specific data we need
+                            mCurrentWeather = getCurrentDetails(jsonData);
 
                         } else {
                             //Object - Dialog box to alert that response failed
@@ -63,6 +73,9 @@ public class MainActivity extends ActionBarActivity {
                         }
                     } catch (IOException e) {
                         //Log the exception
+                        Log.e(TAG, "Exception caught: ", e);
+                    }
+                    catch (JSONException e){
                         Log.e(TAG, "Exception caught: ", e);
                     }
                 }
@@ -74,6 +87,28 @@ public class MainActivity extends ActionBarActivity {
             Toast.makeText(this, getString(R.string.no_network_available), Toast.LENGTH_LONG).show();
         }
     }
+
+    private CurrentWeather getCurrentDetails(String jsonData) throws JSONException {
+        JSONObject forecast = new JSONObject(jsonData);
+        String timezone = forecast.getString("timezone");
+        Log.i(TAG, "From JSON: " + timezone);
+
+        JSONObject currently = forecast.getJSONObject("currently");
+
+        CurrentWeather currentWeather = new CurrentWeather();
+        currentWeather.setmHumidity(currently.getDouble("humidity"));
+        currentWeather.setmTime(currently.getLong("time"));
+        currentWeather.setmIcon(currently.getString("icon"));
+        currentWeather.setmPrecipChance(currently.getDouble("precipProbability"));
+        currentWeather.setmSummary(currently.getString("summary"));
+        currentWeather.setmTemperature(currently.getDouble("temperature"));
+        currentWeather.setmTimeZone(timezone);
+
+        Log.d(TAG, currentWeather.getFormattedTime());
+
+        return new CurrentWeather();
+    }
+
     //Object that checks if network is available. Required Android permission ACCESS NETWORK STATE
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
