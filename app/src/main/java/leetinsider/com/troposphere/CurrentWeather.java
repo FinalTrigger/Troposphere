@@ -30,6 +30,7 @@ public class CurrentWeather {
     }
 
     public int getIconId() {
+        //Set icons to the forecast.io data points for "icon"
         // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
         int iconId = R.drawable.clear_day;
 
@@ -74,7 +75,7 @@ public class CurrentWeather {
     public long getmTime() {
         return mTime;
     }
-
+    //Convert the UNIX time to proper date
     public String getFormattedTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
         formatter.setTimeZone(TimeZone.getTimeZone(getmTimeZone()));
