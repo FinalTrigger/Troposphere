@@ -30,6 +30,5 @@ Based on the Forecast.io API to GET JSON data for a location (currently hardcode
 - Application works currently with pre defined location set to Newark, NJ (NJIT)
 - Refactor entire code for memory optimization and readability flow w/ comments
 
-* Note: The app is complete. All additional features are to be added such as
-    Weather data based on user location via GPS
-    Social media info share functionality
+###### Note:
+- The app is complete. All additional features are to be added such as weather data based on user location via GPS social media info share functionality
