@@ -16,10 +16,10 @@ Based on the Forecast.io API to GET JSON data for a location (currently hardcode
 - Add Object to convert UNIX system time to standard date time "h:mm am/pm"
 
 2/2:
--Finished parsing all JSON data and setting them to the correct variables
--Implement ButterKnife API to reduce boiler code on declaring/setting variables
--Update the text holders on the view with the relative data
--Completed UI
+- Finished parsing all JSON data and setting them to the correct variables
+- Implement ButterKnife API to reduce boiler code on declaring/setting variables
+- Update the text holders on the view with the relative data
+- Completed UI
     Weather
     Humidity
     Precipitation
@@ -27,9 +27,9 @@ Based on the Forecast.io API to GET JSON data for a location (currently hardcode
     Weather Icon
     Current Time
     Refresh / Progress loader
--Application works currently with pre defined location set to Newark, NJ (NJIT)
--Refactor entire code for memory optimization and readability flow w/ comments
+- Application works currently with pre defined location set to Newark, NJ (NJIT)
+- Refactor entire code for memory optimization and readability flow w/ comments
 
-*Note: The app is complete. All additional features are to be added such as
+* Note: The app is complete. All additional features are to be added such as
     Weather data based on user location via GPS
     Social media info share functionality
