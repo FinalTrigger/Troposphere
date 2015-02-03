@@ -17,24 +17,27 @@ public class CurrentWeather {
     private String mSummary;
     private String mTimeZone;
 
-    public String getmTimeZone() {
+    public String getTimeZone() {
         return mTimeZone;
     }
 
-    public void setmTimeZone(String mTimeZone) {
-        this.mTimeZone = mTimeZone;
+    public void setTimeZone(String timeZone) {
+        mTimeZone = timeZone;
     }
 
-    public String getmIcon() {
+    public String getIcon() {
         return mIcon;
     }
 
+    public void setIcon(String icon) {
+        mIcon = icon;
+    }
+
     public int getIconId() {
-        //Set icons to the forecast.io data points for "icon"
-        // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
+        // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night.
         int iconId = R.drawable.clear_day;
 
-        if (mIcon.equals("clear-day")){
+        if (mIcon.equals("clear-day")) {
             iconId = R.drawable.clear_day;
         }
         else if (mIcon.equals("clear-night")) {
@@ -68,56 +71,53 @@ public class CurrentWeather {
         return iconId;
     }
 
-    public void setmIcon(String mIcon) {
-        this.mIcon = mIcon;
-    }
-
-    public long getmTime() {
+    public long getTime() {
         return mTime;
     }
-    //Convert the UNIX time to proper date
+
     public String getFormattedTime() {
         SimpleDateFormat formatter = new SimpleDateFormat("h:mm a");
-        formatter.setTimeZone(TimeZone.getTimeZone(getmTimeZone()));
-        Date dateTime = new Date(getmTime() * 1000);
+        formatter.setTimeZone(TimeZone.getTimeZone(getTimeZone()));
+        Date dateTime = new Date(getTime() * 1000);
         String timeString = formatter.format(dateTime);
 
         return timeString;
     }
 
-    public void setmTime(long mTime) {
-        this.mTime = mTime;
+    public void setTime(long time) {
+        mTime = time;
     }
 
-    public double getmTemperature() {
-        return mTemperature;
+    public int getTemperature() {
+        return (int)Math.round(mTemperature);
     }
 
-    public void setmTemperature(double mTemperature) {
-        this.mTemperature = mTemperature;
+    public void setTemperature(double temperature) {
+        mTemperature = temperature;
     }
 
-    public double getmHumidity() {
+    public double getHumidity() {
         return mHumidity;
     }
 
-    public void setmHumidity(double mHumidity) {
-        this.mHumidity = mHumidity;
+    public void setHumidity(double humidity) {
+        mHumidity = humidity;
     }
 
-    public double getmPrecipChance() {
-        return mPrecipChance;
+    public int getPrecipChance() {
+        double precipPercentage = mPrecipChance * 100;
+        return (int)Math.round(precipPercentage);
     }
 
-    public void setmPrecipChance(double mPrecipChance) {
-        this.mPrecipChance = mPrecipChance;
+    public void setPrecipChance(double precipChance) {
+        mPrecipChance = precipChance;
     }
 
-    public String getmSummary() {
+    public String getSummary() {
         return mSummary;
     }
 
-    public void setmSummary(String mSummary) {
-        this.mSummary = mSummary;
+    public void setSummary(String summary) {
+        mSummary = summary;
     }
 }
