@@ -3,6 +3,9 @@ Weather app for CS656
 
 Based on the Forecast.io API to GET JSON data for a location (currently hardcoded).
 
+![alt text](https://raw.github.com/finaltrigger/troposphere/master/TropoSphere_Preview_Image.png)
+
+
 # Key Releases
 
 1/24:
