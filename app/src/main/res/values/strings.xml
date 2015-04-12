@@ -8,5 +8,9 @@
     <string name="error_message">There was an error. Please try again.</string>
     <string name="error_okButton_text">OK</string>
     <string name="no_network_available">No network available!</string>
-
+    <string name="no_location_data_provided">No location data provided</string>
+    <string name="service_not_available">No location data provided</string>
+    <string name="invalid_lat_long_used">Invalid latitude or longitude provided</string>
+    <string name="no_address_found">No Address found</string>
+    <string name="address_found">address found</string>
 </resources>
