@@ -24,5 +24,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile 'com.squareup.okhttp:okhttp:2.2.0'
     compile 'com.jakewharton:butterknife:6.1.0'
+    compile 'com.google.android.gms:play-services:7.0.0'
 
 }
