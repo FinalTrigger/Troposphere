@@ -96,6 +96,12 @@ public class MainActivity extends ActionBarActivity implements
         //Log letting dev know activity is running
         Log.d(TAG, "Main UI code is running!");
     }
+    @Override
+    protected void onStop(){
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
     //Main function that parse forecast.io api for data
     private void getForecast(double latitude, double longitude) {
         //Api dev key to inject to the forecastUrl
