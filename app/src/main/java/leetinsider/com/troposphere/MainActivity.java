@@ -2,13 +2,14 @@ package leetinsider.com.troposphere;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Handler;
-import android.os.ResultReceiver;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -22,8 +23,6 @@ import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListe
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.common.ConnectionResult;
 
-import android.content.Intent;
-
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
@@ -34,6 +33,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -62,8 +64,6 @@ public class MainActivity extends ActionBarActivity implements
 
     private GoogleApiClient mGoogleApiClient;
 
-    private AddressResultReceiver mResultReceiver;
-
     private String mAddressFromGeoCoder;
 
 
@@ -79,8 +79,6 @@ public class MainActivity extends ActionBarActivity implements
         buildGoogleApiClient();
 
         mGoogleApiClient.connect();
-
-        mResultReceiver = new AddressResultReceiver(new Handler());
 
         //Set click listener for refresh - call getForecast function
         mRefreshImageView.setOnClickListener(new View.OnClickListener() {
@@ -203,6 +201,7 @@ public class MainActivity extends ActionBarActivity implements
             getForecast(mLastLocation.getLatitude(), mLastLocation.getLongitude());
             getLocationName();
         }
+        updateDisplay();
     }
     @Override
     public void onConnectionSuspended(int cause){
@@ -220,19 +219,64 @@ public class MainActivity extends ActionBarActivity implements
          }
     }
     protected void getLocationName() {
-        // Create an intent for passing to the intent service responsible for fetching the address.
-        Intent intent = new Intent(this, FetchAddressIntentService.class);
+        //Create a Geocoder and use it to resolve address from lat and long coords
+        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        String errorMessage = "";
+        // Address found using the Geocoder.
+        List<Address> addresses = null;
 
-        // Pass the result receiver as an extra to the service.
-        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+        try {
+            // Using getFromLocation() returns an array of Addresses for the area immediately
+            // surrounding the given latitude and longitude. The results are a best guess and are
+            // not guaranteed to be accurate.
+            addresses = geocoder.getFromLocation(
+                    mLastLocation.getLatitude(),
+                    mLastLocation.getLongitude(),
+                    // In this sample, we get just a single address.
+                    1);
+        } catch (IOException ioException) {
+            // Catch network or other I/O problems.
+            errorMessage = getString(R.string.no_location_data_provided);
+            Log.e(TAG, errorMessage, ioException);
+            mAddressFromGeoCoder = "No Address Found";
+        } catch (IllegalArgumentException illegalArgumentException) {
+            // Catch invalid latitude or longitude values.
+            errorMessage = getString(R.string.invalid_lat_long_used);
+            Log.e(TAG, errorMessage + ". " +
+                    "Latitude = " + mLastLocation.getLatitude() +
+                    ", Longitude = " + mLastLocation.getLongitude(), illegalArgumentException);
+            mAddressFromGeoCoder = "No Address Found";
+        }
 
-        // Pass the location data as an extra to the service.
-        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
-
-        // Start the service. If the service isn't already running, it is instantiated and started
-        // (creating a process for it if needed); if it is running then it remains running. The
-        // service kills itself automatically once all intents are processed.
-        startService(intent);
+        // Handle case where no address was found.
+        if (addresses == null || addresses.size() == 0) {
+            if (errorMessage.isEmpty()) {
+                errorMessage = getString(R.string.no_address_found);
+                Log.e(TAG, errorMessage);
+                mAddressFromGeoCoder = "No Address Found";
+            }
+        } else {
+            Address address = addresses.get(0);
+            ArrayList<String> addressFragments = new ArrayList<String>();
+            // Fetch the address lines using {@code getAddressLine},
+            // join them, and send them to the thread. The {@link android.location.address}
+            // class provides other options for fetching address details that you may prefer
+            // to use. Here are some examples:
+            // getLocality() ("Mountain View", for example)
+            // getAdminArea() ("CA", for example)
+            // getPostalCode() ("94043", for example)
+            // getCountryCode() ("US", for example)
+            // getCountryName() ("United States", for example)
+//            for (int i = 0; i < address.getMaxAddressLineIndex(); i++) {
+            //              addressFragments.add(address.getAddressLine(i));
+            //        }
+            if (address.getLocality() != null) addressFragments.add(address.getLocality());
+            if (address.getAdminArea() != null) addressFragments.add(address.getAdminArea());
+            if (address.getPostalCode() != null)addressFragments.add(address.getPostalCode());
+            Log.i(TAG, getString(R.string.address_found));
+            mAddressFromGeoCoder = TextUtils.join(System.getProperty("line.separator"), addressFragments);
+        }
+        updateDisplay();
     }
 
     private void toggleRefresh() {
@@ -309,32 +353,6 @@ public class MainActivity extends ActionBarActivity implements
     private void alertUserAboutError() {
         AlertDialogFragment dialog = new AlertDialogFragment();
         dialog.show(getFragmentManager(), "error_dialog");
-    }
-
-    class AddressResultReceiver extends ResultReceiver {
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
-        /*
-         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
-         */
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-
-            // Display the address string or an error message sent from the intent service.
-
-            // Show a toast message if an address was found.
-            if (resultCode == Constants.SUCCESS_RESULT) {
-                mAddressFromGeoCoder = resultData.getString(Constants.RESULT_DATA_KEY);
-                Log.d(TAG,String.format("Address [%s] was found", mAddressFromGeoCoder));
-            }
-            else
-            {
-                Log.e(TAG,"No Address returned geocoder!");
-                mAddressFromGeoCoder = "No Address Found";
-            }
-            updateDisplay();
-        }
     }
 
 }
